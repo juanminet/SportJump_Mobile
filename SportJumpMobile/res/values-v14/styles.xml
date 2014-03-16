@@ -7,7 +7,7 @@
     -->
     <style name="AppBaseTheme" parent="android:Theme.Holo.Light">
         <!-- API 14 theme customizations can go here. -->
-        <item name="android:icon">@drawable/action_bar_logo</item>
+        <item name="android:icon">@drawable/ic_launcher</item>
     </style>   
 	
 
