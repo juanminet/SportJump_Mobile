@@ -9,6 +9,14 @@ public class HttpResponseObject {
 		this.json = json;
 		this.status = status;
 	}
+	
+	
+	public  HttpResponseObject(int status) {
+		super();
+		this.status = status;
+	}
+
+
 	public String getJson() {
 		return json;
 	}

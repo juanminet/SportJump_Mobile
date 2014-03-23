@@ -7,5 +7,6 @@ public class ServiceConstants {
 	
 	public static final String HANDLER_KEY_CANCEL = "Cancel";
 	public static final String HANDLER_KEY_SUCCESS = "Success";
-	public static final String HANDLER_KEY_STATUS = "Status";	
+	public static final String HANDLER_KEY_STATUS = "Status";
+	public static final String HANDLER_KEY_OBJECT = "Object";	
 }

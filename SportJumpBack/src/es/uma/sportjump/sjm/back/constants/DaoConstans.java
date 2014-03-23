@@ -13,11 +13,14 @@ public class DaoConstans {
 	public static final String UNSECURE_URL_BASE_PATH = "http://" + IP_HOST  + ":" + UNSECURE_PORT + SERVER_NAME + API_REST_PATH;
 
 	public static final String LOGIN_PATH = "/user/login";
-	public static final String USER_ATHLETE_DATA_PATH = "/user/athlete"; 
+	public static final String USER_ATHLETE_DATA_PATH = "/user/athlete";
+	
+	public static final String PLANNING_EVENT_DATA_PATH = "/planning/event";
+	public static final String PLANNING_ATHLETE_DATA_PATH = "/planning/athlete";
 	
 	//Shared Preferences
 	public static final String  APPLICATION_PREFERENCE_NAME= "ApplicationPreference";
 	public static final String APPLICATION_PREFERENCE_KEY_USER_LOGGED = "UserLogged";
-	public static final String APPLICATION_PREFERENCE_KEY_USERNAME = null;
-	public static final String APPLICATION_PREFERENCE_KEY_PASSWORD = null;
+	public static final String APPLICATION_PREFERENCE_KEY_USERNAME = "UserName";
+	public static final String APPLICATION_PREFERENCE_KEY_PASSWORD = "Password";
 }

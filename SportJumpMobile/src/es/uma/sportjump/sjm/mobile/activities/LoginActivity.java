@@ -6,6 +6,7 @@ import roboguice.inject.InjectView;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,6 +14,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -63,7 +65,7 @@ public class LoginActivity extends RoboActivity {
 	 * If there are form errors (invalid email, missing fields, etc.), the
 	 * errors are presented and no actual login attempt is made.
 	 */
-	public void attemptLogin() {
+	private void attemptLogin() {
 		if (loginAttempting) {
 			return;
 		}
@@ -99,6 +101,10 @@ public class LoginActivity extends RoboActivity {
 		}
 	}	
 
+	private void hideKeyboard(){
+		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(passwordView.getWindowToken(), 0);
+	}
 
 	private void showProgress(final boolean show) {
 		
@@ -135,6 +141,7 @@ public class LoginActivity extends RoboActivity {
 			public void handleMessage(Message msg) {
 				super.handleMessage(msg);
 				
+				
 				Bundle data = msg.getData();
 				
 				showProgress(false);
@@ -165,6 +172,7 @@ public class LoginActivity extends RoboActivity {
 	}
 	
 	private void startHomeActivity(){
+		hideKeyboard();
 		Intent intent = new Intent(mActivity, HomeActivity.class);
 		startActivity(intent);	
 	}

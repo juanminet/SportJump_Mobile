@@ -13,7 +13,7 @@ public class SportjumpApplication extends Application{
 
 	        DaoRoboModule daoRoboModule = new DaoRoboModule();
 	        ServiceRoboModule serviceRoboModule = new ServiceRoboModule();
-	        RoboGuice.setBaseApplicationInjector(this, RoboGuice.DEFAULT_STAGE,RoboGuice.newDefaultRoboModule(this),
+	        RoboGuice.setBaseApplicationInjector(SportjumpApplication.this, RoboGuice.DEFAULT_STAGE,RoboGuice.newDefaultRoboModule(this),
 	        		daoRoboModule,
 	        		serviceRoboModule
 	        );

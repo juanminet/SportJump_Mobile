@@ -24,7 +24,8 @@
         <activity
             android:icon="@drawable/sportjump_ico_logo"
             android:name="es.uma.sportjump.sjm.mobile.activities.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name" 
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

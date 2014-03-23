@@ -74,6 +74,7 @@ public class FooService {
 			super();
 			this.handler = handler;
 		}
+    	
 
 		Handler handler;
     	

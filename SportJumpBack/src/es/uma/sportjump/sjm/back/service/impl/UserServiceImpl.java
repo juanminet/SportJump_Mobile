@@ -13,7 +13,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import es.uma.sportjump.sjm.back.constants.ServiceConstants;
-import es.uma.sportjump.sjm.back.dao.ApplicationPreferencesDao;
+import es.uma.sportjump.sjm.back.dao.CredentialsDao;
 import es.uma.sportjump.sjm.back.dao.UserDao;
 import es.uma.sportjump.sjm.back.dao.http.service.responses.HttpResponseObject;
 import es.uma.sportjump.sjm.back.service.UserService;
@@ -23,14 +23,18 @@ import es.uma.sportjump.sjm.back.service.types.ApplicationStatusType;
 @Singleton
 public class UserServiceImpl implements UserService {
 
-	@Inject ApplicationPreferencesDao applicationPreferencesDao;
+	@Inject CredentialsDao credentialsDao;
 	@Inject UserDao userDao;
 	
 	@Override
 	public boolean isUserLogged() {		
-		return applicationPreferencesDao.isUserLogged();		
+		return credentialsDao.isUserLogged();		
 	}
-
+	
+	@Override
+	public void logout() {
+		credentialsDao.deleteUserPassword();		
+	}
 
 	@Override
 	public void loginUser(String username, String password, Handler uiHandler) {
@@ -62,7 +66,7 @@ public class UserServiceImpl implements UserService {
 				return ApplicationStatusType.STATUS_IO_ERROR.getCode();
 			}
 
-			applicationPreferencesDao.addUserPassword(username, password);
+			credentialsDao.addUserPassword(username, password);
 			
 			// TODO: register the new account here.
 			return responseObject.getStatus();
@@ -100,5 +104,9 @@ public class UserServiceImpl implements UserService {
 			uiHandler.handleMessage(msg);
 		}
 	}
+
+
+
+
 
 }
