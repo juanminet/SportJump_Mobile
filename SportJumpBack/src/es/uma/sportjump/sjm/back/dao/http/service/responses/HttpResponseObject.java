@@ -2,7 +2,7 @@ package es.uma.sportjump.sjm.back.dao.http.service.responses;
 
 public class HttpResponseObject {
     private String json;
-    private int status;
+    private int status = -1;
     
 	public HttpResponseObject(String json, int status) {
 		super();

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SportJump</string>
+    
+    <!-- Strings related to ActioBar -->
+    <string name="action_settings">Configuracion</string>
+    <string name="action_exit">Salir</string>
+    <string name="action_logout">Desconectar</string>
+     <string name="action_refresh">Actualizar</string>
+  
+    <!-- Strings related to loginActivity -->
+    <string name="title_activity_login">Credenciales</string>
+    <string name="login_prompt_username">Usuario</string>
+    <string name="login_prompt_password">Contraseña</string>
+    <string name="login_action_sign_in">Enviar</string>
+    <string name="login_action_forgot_password">Recuperar antigua contraseña</string>
+    <string name="login_progress_signing_in">Enviando &#8230;</string>
+    <string name="login_error_invalid_username">El usuario o la contraseña es erronea</string>
+    <string name="login_error_invalid_password">Esta contraseña es demasiado corta</string>
+    <string name="login_error_incorrect_password">La contraseña es incorrecta</string>
+    <string name="login_error_field_required">Este campo es obligatorio</string>
+    
+    <!-- Strings related to HomeActivity -->
+    <string name="title_activity_home">Principal</string>
+    
+        <!-- Strings related to TrainingFragment -->
+    <string name="frag_training_no_training">No hay entrenamientos para el %1$s</string>
+    <string name="frag_training_date">Fecha</string>
+    <string name="frag_training_name">Nombre</string>
+    <string name="frag_training_training">Entrenamiento</string>
+    <string name="frag_training_description">Descripción</string>
+      
+    <!-- String Toast -->
+    <string name="toast_internal_error">Error interno de la aplicación</string>
+    <string name="toast_http_error">Error de conectividad</string>
+    <string name="toast_db_error">Error de datos</string>
+
+</resources>

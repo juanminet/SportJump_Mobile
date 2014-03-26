@@ -23,7 +23,7 @@ import com.google.inject.Inject;
 
 import es.uma.sportjump.sjm.back.constants.ServiceConstants;
 import es.uma.sportjump.sjm.back.service.UserService;
-import es.uma.sportjump.sjm.back.service.types.ApplicationStatusType;
+import es.uma.sportjump.sjm.back.types.ApplicationStatusType;
 import es.uma.sportjump.sjm.mobile.R;
 
 

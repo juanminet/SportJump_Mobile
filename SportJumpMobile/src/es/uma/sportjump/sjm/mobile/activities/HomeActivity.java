@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,15 +27,18 @@ import com.roomorama.caldroid.CaldroidListener;
 
 import es.uma.sportjump.sjm.back.constants.ServiceConstants;
 import es.uma.sportjump.sjm.back.dto.CalendarEventDto;
-import es.uma.sportjump.sjm.back.dto.TrainingDto;
+import es.uma.sportjump.sjm.back.exceptions.SportJumpBackException;
+import es.uma.sportjump.sjm.back.responses.CalendarEventResponse;
 import es.uma.sportjump.sjm.back.service.PlanningService;
 import es.uma.sportjump.sjm.back.service.UserService;
-import es.uma.sportjump.sjm.back.service.types.ApplicationStatusType;
+import es.uma.sportjump.sjm.back.types.ApplicationStatusType;
 import es.uma.sportjump.sjm.mobile.R;
 import es.uma.sportjump.sjm.mobile.activities.fragments.TrainingDayDialogFragment;
 
 @ContentView(R.layout.activity_home)
 public class HomeActivity extends RoboFragmentActivity {
+	
+	protected static final String LOG_TAG = "[" + HomeActivity.class.getCanonicalName() + "]";
 	
 	@Inject UserService userService;
 	@Inject PlanningService planningService;
@@ -59,12 +63,7 @@ public class HomeActivity extends RoboFragmentActivity {
 	protected void onResume() {
 		super.onResume();
 		
-		initCalendar();
-
-		if (isDualPane) {
-			showTrainingDayFragment(planningService.findCalendarEvent(Calendar.getInstance().getTime()));
-		}
-		
+		initCalendar();		
 	}	
 
 	
@@ -95,6 +94,7 @@ public class HomeActivity extends RoboFragmentActivity {
 		
 		final CaldroidFragment caldroidFragmentHandler = caldroidFragment;
 		final Handler handler = new Handler(Looper.getMainLooper()){
+			
 			@Override
 			public void handleMessage(Message msg) {
 				super.handleMessage(msg);
@@ -103,33 +103,53 @@ public class HomeActivity extends RoboFragmentActivity {
 				Bundle data = msg.getData();
 				
 				if (!data.containsKey(ServiceConstants.HANDLER_KEY_CANCEL)){
-					if (data.containsKey(ServiceConstants.HANDLER_KEY_SUCCESS)){
-						ArrayList<CalendarEventDto> listCalendarEvents = (ArrayList<CalendarEventDto>) data.getSerializable(ServiceConstants.HANDLER_KEY_OBJECT);
+					if (data.containsKey(ServiceConstants.HANDLER_KEY_OBJECT)){
 						
-						for (CalendarEventDto event : listCalendarEvents){
-							caldroidFragmentHandler.setBackgroundResourceForDate(android.R.color.holo_orange_dark,event.getDateStart());
-							caldroidFragmentHandler.setTextColorForDate(R.color.caldroid_white, event.getDateStart());
-						}
+						CalendarEventResponse response = (CalendarEventResponse) data.getSerializable(ServiceConstants.HANDLER_KEY_OBJECT);
 						
-						caldroidFragmentHandler.refreshView();
-					}else{
-						ApplicationStatusType status = ApplicationStatusType.fromCode(data.getInt(ServiceConstants.HANDLER_KEY_STATUS));
 						
-						if (ApplicationStatusType.STATUS_UNAUTHORIZED == status){
-							logout();
+						if (ApplicationStatusType.STATUS_OK == response.getStatusType()){
+						
+							ArrayList<CalendarEventDto> listCalendarEvents = response.getListCalendarEvents();
+							
+							for (CalendarEventDto event : listCalendarEvents){
+								caldroidFragmentHandler.setBackgroundResourceForDate(android.R.color.holo_orange_dark,event.getDateStart());
+								caldroidFragmentHandler.setTextColorForDate(R.color.caldroid_white, event.getDateStart());
+							}
+							
+							caldroidFragmentHandler.refreshView();
+							
+							if (isDualPane) {
+								showTrainingDayFragment(planningService.findCalendarEvent(Calendar.getInstance().getTime()), Calendar.getInstance().getTime());
+							}
+						
 						}else{
-							Toast.makeText(mActivity, "ERROR", Toast.LENGTH_LONG).show();
-						}
+							ApplicationStatusType status = response.getStatusType();
+							
+							if (ApplicationStatusType.STATUS_UNAUTHORIZED == status){
+								logout();
+							}else if (ApplicationStatusType.STATUS_IO_ERROR == status){
+								Toast.makeText(mActivity, getString(R.string.toast_http_error), Toast.LENGTH_LONG).show();
+							}else{
+								Toast.makeText(mActivity, getString(R.string.toast_internal_error), Toast.LENGTH_LONG).show();
+							}
+						}						
+						
+					}else{
+						Toast.makeText(mActivity, getString(R.string.toast_internal_error), Toast.LENGTH_LONG).show();
 					}					
 				}				
 			}			
 		};
 		planningService.findAllEvents(handler);
 
+		if (isDualPane) {
+			showTrainingDayFragment(planningService.findCalendarEvent(Calendar.getInstance().getTime()), Calendar.getInstance().getTime());
+		}
 	}
 	
-	private void showTrainingDayFragment(CalendarEventDto calendarEvent) {
-		DialogFragment fragment = TrainingDayDialogFragment.newInstance(calendarEvent);
+	private void showTrainingDayFragment(CalendarEventDto calendarEvent, Date date) {
+		DialogFragment fragment = TrainingDayDialogFragment.newInstance(calendarEvent,date);
 		
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		Fragment previousFragment = getFragmentManager().findFragmentByTag("trainingDayFragment");
@@ -143,7 +163,7 @@ public class HomeActivity extends RoboFragmentActivity {
 		
 	}
 
-	private void showTrainingDayDialog(CalendarEventDto calendarEvent) {
+	private void showTrainingDayDialog(CalendarEventDto calendarEvent, Date date) {
 
 	    FragmentTransaction transaction = getFragmentManager().beginTransaction();
 	    Fragment previousFragment = getFragmentManager().findFragmentByTag("trainingDayFragmentDialog");
@@ -153,15 +173,15 @@ public class HomeActivity extends RoboFragmentActivity {
 	    transaction.addToBackStack(null);
 
 	    // Create and show the dialog.
-	    DialogFragment newFragment = TrainingDayDialogFragment.newInstance(calendarEvent);
+	    DialogFragment newFragment = TrainingDayDialogFragment.newInstance(calendarEvent, date);
 	    newFragment.show(transaction, "trainingDayFragmentDialog");
 	}
 	
-	private void showTraining(CalendarEventDto calendarEvent) {
+	private void showTraining(CalendarEventDto calendarEvent, Date date) {
 		if(isDualPane){
-			showTrainingDayFragment(calendarEvent);
+			showTrainingDayFragment(calendarEvent, date);
 		}else{
-			showTrainingDayDialog(calendarEvent);
+			showTrainingDayDialog(calendarEvent, date);
 		}
 	}
 	
@@ -170,8 +190,13 @@ public class HomeActivity extends RoboFragmentActivity {
 
 		@Override
 		public void onSelectDate(Date date, View view) {
+			try{
 			CalendarEventDto calendarEvent = planningService.findCalendarEvent(date);
-			showTraining(calendarEvent);
+			showTraining(calendarEvent, date);
+			}catch (SportJumpBackException sportJumpBackException) {
+				Toast.makeText(mActivity, getString(R.string.toast_db_error), Toast.LENGTH_LONG).show();
+				Log.i(LOG_TAG, sportJumpBackException.toString());
+			}
 		}
 	
 	};
@@ -207,7 +232,7 @@ public class HomeActivity extends RoboFragmentActivity {
 				Toast.makeText(this, "pulsado", Toast.LENGTH_LONG).show();
 				return true;
 			case R.id.action_refresh:
-				Toast.makeText(this, "Refrescando", Toast.LENGTH_LONG).show();
+				initCalendar();
 				return true;
 			case R.id.action_settings:
 				Toast.makeText(this, "Seteando", Toast.LENGTH_LONG).show();

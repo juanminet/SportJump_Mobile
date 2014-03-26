@@ -6,4 +6,5 @@ public class MobileConstants {
 	
 	
 	public static final String FRAGMENT_INIT_KEY_CALENDAR_EVENT = "FRAGMENT_INIT_KEY_TRAINING";
+	public static final String FRAGMENT_INIT_KEY_DATE = "FRAGMENT_INIT_KEY_DATE";
 }

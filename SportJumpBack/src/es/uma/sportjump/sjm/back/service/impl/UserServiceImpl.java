@@ -17,7 +17,7 @@ import es.uma.sportjump.sjm.back.dao.CredentialsDao;
 import es.uma.sportjump.sjm.back.dao.UserDao;
 import es.uma.sportjump.sjm.back.dao.http.service.responses.HttpResponseObject;
 import es.uma.sportjump.sjm.back.service.UserService;
-import es.uma.sportjump.sjm.back.service.types.ApplicationStatusType;
+import es.uma.sportjump.sjm.back.types.ApplicationStatusType;
 
 
 @Singleton

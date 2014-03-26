@@ -24,11 +24,17 @@
     <!-- Strings related to HomeActivity -->
     <string name="title_activity_home">Home</string>
     
-        <!-- Strings related to TrainingFragment -->
-    <string name="frag_training_no_training">There is not a training in the date selected</string>
+    <!-- Strings related to TrainingFragment -->
+    <string name="frag_training_no_training">There is not trainings in %1$s</string>
     <string name="frag_training_date">Date</string>
     <string name="frag_training_name">Name</string>
     <string name="frag_training_training">Training</string>
-      <string name="frag_training_description">Description</string>
+    <string name="frag_training_description">Description</string>
+    
+    
+    <!-- String Toast -->
+    <string name="toast_internal_error">Internal Error</string>
+    <string name="toast_http_error">Connectivity Error</string>
+    <string name="toast_db_error">Data Error</string>
 
 </resources>

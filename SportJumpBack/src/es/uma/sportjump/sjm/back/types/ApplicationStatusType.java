@@ -1,4 +1,4 @@
-package es.uma.sportjump.sjm.back.service.types;
+package es.uma.sportjump.sjm.back.types;
 
 import android.annotation.SuppressLint;
 import java.util.HashMap;
@@ -11,7 +11,8 @@ public enum ApplicationStatusType {
 	STATUS_OK (HttpStatus.SC_OK),
 	STATUS_UNAUTHORIZED (HttpStatus.SC_UNAUTHORIZED),
 	STATUS_INTERNAL_SERVER_ERROR (HttpStatus.SC_INTERNAL_SERVER_ERROR),
-	STATUS_IO_ERROR(600);
+	STATUS_IO_ERROR(600),
+	STATUS_ERROR(601);
 	
 	private Integer code;
 

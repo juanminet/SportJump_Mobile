@@ -79,14 +79,14 @@ public class CalendarEventDto  implements Serializable{
 	}
 
 
-	public CalendarEventDto objectfromJson(String json) {
+	public static CalendarEventDto objectfromJson(String json) {
 		final Gson gson = new Gson();		
 		final CalendarEventDto calendarEvent = gson.fromJson(json, CalendarEventDto.class);
 
 		return calendarEvent;
 	}
 
-	public ArrayList<CalendarEventDto> listfromJson(String json) {
+	public static ArrayList<CalendarEventDto> listfromJson(String json) {
 		final Gson gson = new Gson();
 		final Type trainingListType = new TypeToken<List<CalendarEventDto>>() {}.getType();
 		final ArrayList<CalendarEventDto> trainingList = gson.fromJson(json, trainingListType);

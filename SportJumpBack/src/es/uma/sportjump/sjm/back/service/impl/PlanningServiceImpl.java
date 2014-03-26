@@ -1,31 +1,25 @@
 package es.uma.sportjump.sjm.back.service.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.apache.http.HttpStatus;
-
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 
 import com.google.inject.Inject;
 
-import es.uma.sportjump.sjm.back.constants.ServiceConstants;
-import es.uma.sportjump.sjm.back.dao.PlanningDao;
-import es.uma.sportjump.sjm.back.dao.http.service.responses.HttpResponseObject;
+import es.uma.sportjump.sjm.back.dao.PlanningDbDao;
+import es.uma.sportjump.sjm.back.dao.PlanningHttpDao;
 import es.uma.sportjump.sjm.back.dto.CalendarEventDto;
+import es.uma.sportjump.sjm.back.exceptions.SportJumpBackException;
+import es.uma.sportjump.sjm.back.responses.CalendarEventResponse;
 import es.uma.sportjump.sjm.back.service.PlanningService;
-import es.uma.sportjump.sjm.back.service.types.ApplicationStatusType;
-import es.uma.sportjump.sjm.back.utils.BackUtils;
+import es.uma.sportjump.sjm.back.types.ApplicationStatusType;
 
-public class PlanningServiceImpl implements PlanningService{
+public class PlanningServiceImpl extends BaseService implements PlanningService{
 
-	@Inject PlanningDao planningDao;
-	
-	
+	@Inject PlanningHttpDao planningDao;
+	@Inject PlanningDbDao planningDbDao;	
 
 	ArrayList<CalendarEventDto> listEvents;
 	
@@ -39,85 +33,101 @@ public class PlanningServiceImpl implements PlanningService{
 	}
 	
 	
-public class PlanningTask extends AsyncTask<String, Void, HttpResponseObject> {
+public class PlanningTask extends AsyncTask<String, Void, CalendarEventResponse> {
 		
 		private Handler uiHandler;
+		
 		public PlanningTask(Handler handler){
 			this.uiHandler = handler;			
 		}	
 		
 
 		@Override
-		protected HttpResponseObject doInBackground(String... params) {			
-			
-			HttpResponseObject responseObject = null;
-			try {
-				responseObject = planningDao.getCalendarEvents();				
-			} catch (IOException ioException){
-				responseObject = new HttpResponseObject(ApplicationStatusType.STATUS_IO_ERROR.getCode());				
-			}		
-			
-			return responseObject;
+		protected CalendarEventResponse doInBackground(String... params) {				
+			return  planningDao.getCalendarEvents();	
 		}
 
 	
 
 		@Override
-		protected void onPostExecute(final HttpResponseObject responseObject) {
-			Bundle data = new Bundle();
-			
+		protected void onPostExecute(final CalendarEventResponse response) {			
 		
-			if (HttpStatus.SC_OK == responseObject.getStatus()){
-				data.putBoolean(ServiceConstants.HANDLER_KEY_SUCCESS, false);
-				data.putInt(ServiceConstants.HANDLER_KEY_STATUS, ApplicationStatusType.STATUS_OK.getCode());
-				
-				CalendarEventDto calendarEventDto = new CalendarEventDto();				
-				ArrayList<CalendarEventDto> listCalendarEventDto = calendarEventDto.listfromJson(responseObject.getJson());	
-				
-				
-
-				listEvents = listCalendarEventDto;
-				
-				data.putSerializable(ServiceConstants.HANDLER_KEY_OBJECT, listCalendarEventDto);				
-				
-			}else if (ApplicationStatusType.STATUS_IO_ERROR.getCode() == responseObject.getStatus()){
-				data.putInt(ServiceConstants.HANDLER_KEY_STATUS, ApplicationStatusType.STATUS_IO_ERROR.getCode());
-			}else{				
-				data.putInt(ServiceConstants.HANDLER_KEY_STATUS, ApplicationStatusType.fromCode(responseObject.getStatus()).getCode());
-			}
-						
-			Message msg = new Message();
-			msg.setData(data);
+			notifyUi(uiHandler, response);
 			
-			uiHandler.handleMessage(msg);			
+			//Store database
+			
+			if (response != null && response.getStatusType() != null && response.getStatusType() == ApplicationStatusType.STATUS_OK){			
+				planningDbDao.setCalendarEvents(response.getListCalendarEvents());
+			}
 		}
 
 		@Override
 		protected void onCancelled() {
-			Bundle data = new Bundle();
-			data.putBoolean(ServiceConstants.HANDLER_KEY_CANCEL, true);
-			
-			Message msg = new Message();
-			msg.setData(data);
-			
-			uiHandler.handleMessage(msg);
-		}
+			notifyUiCancel(uiHandler);
+		}		
 	}
 
+	
+//try{
+// 	Cursor eventCursor = planningDbDao.getCalendarEvents();
+//    if(eventCursor != null){
+//    	listCalendarEventDto = new ArrayList<CalendarEventDto>();
+//    	
+//    	eventCursor.moveToFirst();			            
+//        while(eventCursor.isAfterLast() == false) {
+//            CalendarEventDto calendarEventDto = new CalendarEventDto();
+//            
+//            String title = eventCursor.getString(eventCursor.getColumnIndex(PlanningContract.PlanningEntry.COLUMN_NAME_TITLE));
+//            String start = eventCursor.getString(eventCursor.getColumnIndex(PlanningContract.PlanningEntry.COLUMN_NAME_DATE));
+//            String trainingJson = eventCursor.getString(eventCursor.getColumnIndex(PlanningContract.PlanningEntry.COLUMN_NAME_TRAINING));
+//            
+//            calendarEventDto.setTitle(title);
+//            calendarEventDto.setStart(start);
+//            
+//            TrainingDto training = TrainingDto.objectfromJson(trainingJson);
+//            calendarEventDto.setTraining(training);
+//        	
+//            listCalendarEventDto.add(calendarEventDto);
+//            
+//            eventCursor.moveToNext();			               
+//        }
+//    }
+//    
+//    eventCursor.close();
+//} catch(SQLException e)  {
+//    e.printStackTrace();
+//}
+//
+//if (listCalendarEventDto != null && listCalendarEventDto.size() > 0){
+//	handleResponse(listCalendarEventDto, ApplicationStatusType.STATUS_OK.getCode());
+//}
 
+
+//	@Override
+//	public CalendarEventDto findCalendarEvent(Date date) {
+//		CalendarEventDto res = null;
+//		
+//		if (listEvents != null){
+//			for(CalendarEventDto event : listEvents){
+//				if (BackUtils.isDateEquals(date, event.getDateStart())){
+//					res = event;
+//				}
+//			}
+//		}
+//		
+//		return res;
+//	}
+	
 	@Override
-	public CalendarEventDto findCalendarEvent(Date date) {
-		CalendarEventDto res = null;
+	public CalendarEventDto findCalendarEvent(Date date)  throws SportJumpBackException{
 		
-		if (listEvents != null){
-			for(CalendarEventDto event : listEvents){
-				if (BackUtils.isDateEquals(date, event.getDateStart())){
-					res = event;
-				}
-			}
+		CalendarEventResponse response = planningDbDao.getCalendarEventByDate(date);
+		
+		if (response.getStatusType() != ApplicationStatusType.STATUS_OK){
+			throw new SportJumpBackException("ERROR accessing Sqlite");
 		}
 		
-		return res;
+		return response.getCalendarEvent();
 	}
 
 }
